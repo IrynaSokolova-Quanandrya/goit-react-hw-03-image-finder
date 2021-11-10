@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import './styles/common.css'
+import { ToastContainer} from 'react-toastify';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+// import fetchImg from './components/image-api';
 import Searchbar from './components/Searchbar';
 import ImageGallery from './components/ImageGallery';
 import Loader from "react-loader-spinner";
@@ -11,72 +13,83 @@ import Button from './components/Button';
 
 class App extends Component {
   state = {
-    url:'https://pixabay.com/api/',
-    images: null,
+    mainURL: 'https://pixabay.com/api/',
+    secondaryURL:'&image_type=photo&orientation=horizontal&per_page=12',
+    images: [],
     myKey:'24253422-4477825d93e6eb518eebc16ed',
     query: '',
     page: 1,
-    status: 'idle'
-
+    status: 'idle',
+    error: null
 
   }
-  // componentDidMount() {
-  //   this.smoothScroll();
-  // }
-  
+   
   componentDidUpdate(prevProps, prevState) {
-    const { url, images, query, page, myKey } = this.state;
-    // console.log(prevState);
-    // if (prevState.images !== images) {
-    //   this.setState({ status: 'pending' })
-    //   return;
-    // }
+    const { mainURL, secondaryURL, query, page, myKey } = this.state;
+    // console.log(images);
     
-    fetch(`${url}?q=${query}&page=${page}&key=${myKey}&image_type=photo&orientation=horizontal&per_page=12`)
-      .then(r => r.json())
-      .then(images => this.setState({ images })
-      )
+    if (prevState.query !== query) {
+      // this.pageReset();
+      this.setState({status:'pending'})
+      // console.log(prevState);
+      // console.log(this.state);
+
+      fetch(`${mainURL}?q=${query}&page=${page}&key=${myKey}${secondaryURL}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json()
+        }
+        return Promise.reject(new Error(`Can not find ${query}!`));
+      })
+      .then((images) => {
+        this.setState((prevState) => ({ images: [...prevState.images, images.hits], status: 'resolved' }))
+        
+      })
+    }
     
+    
+  
   }
-  smoothScroll = () => {
-    window.scrollTo({
-      top: Searchbar,
-      behavior: 'smooth',
-    });
-  }
+  // smoothScroll = () => {
+  //   window.scrollTo({
+  //     top: Searchbar,
+  //     behavior: 'smooth',
+  //   });
+  // }
   pageReset = () => {
     this.setState({page: 1})
   }
-  
+  nextPage = () => {
+    this.setState((prevState)=>({page: prevState+1}))
+  }
   searchQuery = query => {
     this.setState({ query });
-    console.log(query);
     this.pageReset();
   }
   render() {
+    
+    // console.log(this.state);
     const { status, images } = this.state
-
-    if (status === 'idle') {
-      return <Searchbar onSubmit={this.searchQuery} />
-    }
-    if (status === 'resolved') {
-      return <ImageGallery images={images}/>
-    }
-    if (status === 'pending') {
-      return <Loader
+    return (
+      <>
+      <Searchbar onSubmit={this.searchQuery} />
+      <ToastContainer autoClose={3000} />
+    {status === 'resolved' && <ImageGallery images={images} />}
+    {status === 'pending' &&
+      <Loader
         className='Loader'
         type="Puff"
         color="#00BFFF"
         height={50}
         width={50}
-        timeout={3000}/>
+        timeout={3000} />
     }
-    if (status === 'resolved') {
-      return <Button />
+    {status === 'resolved' && <Button />
     }
-        // {/* <Modal />  */}
-    
-  } 
+    {/* <Modal />  */}
+    </>
+   )
+  }
 }
 
 export default App
