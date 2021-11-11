@@ -1,16 +1,26 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 class ImageGalleryItem extends Component{
     render() {
-        const {id, src, alt} = this.props
+        const {webformatURL, tags,} = this.props.image
         return (
-            <li id={id} className="ImageGalleryItem">
-                <img src={src} alt={alt} className="ImageGalleryItem-image" />
+            <li className="ImageGalleryItem">
+                <img
+                    src={webformatURL}
+                    alt={tags}
+                    className="ImageGalleryItem-image"
+                    showModal={this.props.onOpen}
+                />
             </li>
         )
     }
 }
 
+ImageGalleryItem.propTypes = {
+  image: PropTypes.object.isRequired,
+  onOpen: PropTypes.func.isRequired,
+};
 export default ImageGalleryItem
 
 
