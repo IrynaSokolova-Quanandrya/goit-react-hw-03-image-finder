@@ -3,14 +3,16 @@ import PropTypes from "prop-types";
 
 class ImageGalleryItem extends Component{
     render() {
-        const {webformatURL, tags,} = this.props.image
+        const {webformatURL, tags, largeImageURL, onOpen, onGetImg} = this.props
         return (
-            <li className="ImageGalleryItem">
+            <li className="ImageGalleryItem"
+                onClick={() => onGetImg(largeImageURL, tags)}
+            >
                 <img
                     src={webformatURL}
                     alt={tags}
                     className="ImageGalleryItem-image"
-                    showModal={this.props.onOpen}
+                    showModal={onOpen}
                 />
             </li>
         )
@@ -18,8 +20,11 @@ class ImageGalleryItem extends Component{
 }
 
 ImageGalleryItem.propTypes = {
-  image: PropTypes.object.isRequired,
+  onGetImg: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
+  webformatURL: PropTypes.string.isRequired,
 };
 export default ImageGalleryItem
 

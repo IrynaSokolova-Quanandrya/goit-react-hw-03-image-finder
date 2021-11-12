@@ -7,6 +7,8 @@ import Searchbar from './components/Searchbar';
 import ImageGallery from './components/ImageGallery';
 import Loader from "react-loader-spinner";
 import Button from './components/Button';
+import Modal from './components/Modal';
+
 
 
 class App extends Component {
@@ -19,16 +21,31 @@ class App extends Component {
     page: 1,
     status: 'idle',
     error: null,
+    showModal: false,
+    modalImage: '',
 
   }
-   
+  componentDidMount() {
+    window.addEventListener('click', e => {
+      // console.log(this.toggleModal);
+      if (e.target.nodeName === "IMG") {
+        this.toggleModal()
+      }
+    })
+  }
   componentDidUpdate(prevProps, prevState) {
     const { mainURL, secondaryURL, query, page, myKey } = this.state;
+
+    window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: "smooth",
+        });
     
     if (prevState.query !== query) {
       this.setState({ status: 'pending' })
       
-      fetch(`${mainURL}?q=${query}&page=${page}&key=${myKey}${secondaryURL}`)
+      setTimeout(() => {
+        fetch(`${mainURL}?q=${query}&page=${page}&key=${myKey}${secondaryURL}`)
       .then(response => {
         if (response.ok) {
           return response.json()
@@ -36,34 +53,23 @@ class App extends Component {
         return Promise.reject(new Error(`Can not find ${query}!`));
       })
         .then((response) => {
-          // console.log(response);
-          // console.log(response.hits);
           this.setState({ images: response.hits, page: page + 1, status: 'resolved' })
-          // console.log(this.state.page);
-        })
+        })     
+      }, 1000);
       
-
-      if (page > 1) {
-        window.scrollTo({
-              top: document.documentElement.scrollHeight,
-              behavior: "smooth",
-        });
-      }
+      
     }
     
   }
-  pageReset = () => {
-    this.setState({page: 1})
-  }
   searchQuery = query => {
     this.setState({ query });
-    this.pageReset();
+    this.setState({page: 1})
   }
   loadMore = () => {
     this.setState((prev) => ({ page: prev.page + 1 }))
     
     const { mainURL, secondaryURL, query, page, myKey } = this.state;
-      // console.log(page);
+     
       fetch(`${mainURL}?q=${query}&page=${page}&key=${myKey}${secondaryURL}`)
       .then(response => {
         if (response.ok) {
@@ -76,31 +82,53 @@ class App extends Component {
         
       })
      
+        
     }
   
+  toggleModal = () => {
+    
+    this.setState(({ showModal }) => (
+      // console.log({ showModal })
+      { showModal: !showModal }
+    ))
+  }
+  setImgModal = (img, alt) => {
+    //  console.log(img, alt);
+    this.setState({ modalImage: { img: img, alt: alt } });
+    // console.log({ modalImage: { img: img, alt: alt } });
+  };
  
   render() {
-    const { status, images } = this.state
-    // console.log(images);
+    console.log(this.state.modalImage);
+    const { status, images, showModal, modalImage } = this.state
     return (
       <>
       <Searchbar onSubmit={this.searchQuery} />
       <ToastContainer autoClose={3000} />
         {status === 'resolved' &&
           <ImageGallery
-            images={images}/>
+          images={images}
+          showModal={this.toggleModal}
+          onGetImg={this.setImgModal}
+        />
         }
         {status === 'pending' &&
           <Loader
             className='Loader'
             type="Puff"
             color="#00BFFF"
-            height={50}
-            width={50}
-            timeout={3000} />
+            height={100}
+            width={100}
+          timeout={3000}
+         style={({margin: '0 50%'})}/>
+        
         }
-        {status === 'resolved' && <Button onClick={this.loadMore}/>
+        {images.length !== 0 && <Button onClick={this.loadMore}/>
         }
+        {showModal && <Modal
+          onClose={this.toggleModal}
+          onGetImg={modalImage}
+        />}
     </>
    )
   }
