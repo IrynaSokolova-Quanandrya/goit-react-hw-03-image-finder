@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
-import ImageGalleryItem from './ImageGalleryItem';
+import React from 'react';
+import ImageGalleryItem from '../ImageGalleryItem';
 import PropTypes from 'prop-types';
+import s from '../ImageGallery/ImageGallery.module.css';
 
-class ImageGallery extends Component {
-  render() {
-    const { images, showModal, onGetImg } = this.props
-    console.log({onGetImg});
-    return (
+function ImageGallery({ images, showModal, onGetImg }) {
+   
+      return (
       
-      <ul className="ImageGallery">
+      <ul className={s.ImageGallery}>
         {
-         images.map(({id, webformatURL, tags, largeImageURL}) => 
+         images.map(({id, webformatURL, tags, largeImageURL}) =>
            <ImageGalleryItem
              key={id}
              webformatURL={webformatURL}
@@ -26,9 +25,6 @@ class ImageGallery extends Component {
     )
   }
   
-  
-} 
-
 ImageGallery.propTypes = {
   images: PropTypes.array.isRequired,
   showModal: PropTypes.func.isRequired,

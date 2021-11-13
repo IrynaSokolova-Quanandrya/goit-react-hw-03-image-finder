@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import './styles/common.css'
 import { ToastContainer} from 'react-toastify';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Searchbar from './components/Searchbar';
@@ -27,7 +26,6 @@ class App extends Component {
   }
   componentDidMount() {
     window.addEventListener('click', e => {
-      // console.log(this.toggleModal);
       if (e.target.nodeName === "IMG") {
         this.toggleModal()
       }
@@ -81,21 +79,16 @@ class App extends Component {
         this.setState((prevState) => ({ images: [...prevState.images, ...response.hits], status: 'resolved' }))
         
       })
-     
-        
-    }
+  }
   
   toggleModal = () => {
     
     this.setState(({ showModal }) => (
-      // console.log({ showModal })
       { showModal: !showModal }
     ))
   }
   setImgModal = (img, alt) => {
-    //  console.log(img, alt);
     this.setState({ modalImage: { img: img, alt: alt } });
-    // console.log({ modalImage: { img: img, alt: alt } });
   };
  
   render() {

@@ -1,23 +1,22 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
+import s from '../ImageGalleryItem/ImageGalleryItem.module.css'
 
-class ImageGalleryItem extends Component{
-    render() {
-        const {webformatURL, tags, largeImageURL, onOpen, onGetImg} = this.props
+function ImageGalleryItem ({webformatURL, tags, largeImageURL, onOpen, onGetImg}) {
         return (
-            <li className="ImageGalleryItem"
+            <li className={s.ImageGalleryItem}
                 onClick={() => onGetImg(largeImageURL, tags)}
             >
                 <img
                     src={webformatURL}
                     alt={tags}
-                    className="ImageGalleryItem-image"
+                    className={s.ImageGalleryItem__image}
                     showModal={onOpen}
                 />
             </li>
         )
     }
-}
+
 
 ImageGalleryItem.propTypes = {
   onGetImg: PropTypes.func.isRequired,
